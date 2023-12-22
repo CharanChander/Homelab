@@ -12,14 +12,14 @@ services:
     environment:
       GF_PATHS_PROVISIONING: "/etc/grafana/provisioning"
     volumes:
-      - /srv/server_monitoring/data/grafana:/var/lib/grafana
-      - /srv/server_monitoring/data/grafana/provisioning:/etc/grafana/provisioning
+      - ./srv/server_monitoring/data/grafana:/var/lib/grafana
+      - ./srv/server_monitoring/data/grafana/provisioning:/etc/grafana/provisioning
 
   prometheus:
     container_name: prometheus
     image: prom/prometheus
     restart: always
     ports:
-      - 9099:9090
+      - 9090:9090
     volumes:
-      - /srv/server_monitoring/data/prometheus:/etc/prometheus
+      - ./srv/server_monitoring/data/prometheus:/etc/prometheus.yml
