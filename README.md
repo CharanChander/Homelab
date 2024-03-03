@@ -1,2 +1,2 @@
 # Documentatie
-Documentatie afou
+Repository voor documentatie
