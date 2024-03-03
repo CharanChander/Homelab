@@ -1,0 +1,122 @@
+version: "3.9"
+
+networks:
+  default:
+    driver: bridge
+
+services:
+
+  transmission:
+    image: linuxserver/transmission:4.0.5
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Brussels
+    volumes:
+      - ./transmission-config:/config
+      - /media/hdd:/media/hdd
+    ports:
+      - 9091:9091
+    restart: always
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Brussels
+    volumes:
+      - ./sonarr:/config
+      - /media/hdd:/media/hdd #ExtraHDD
+    ports:
+      - 8989:8989
+    restart: always
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Brussels
+    volumes:
+      - ./radarr:/config
+      - /media/hdd:/media/hdd #ExtraHDD
+    ports:
+      - 7878:7878
+    restart: always
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Brussels
+    volumes:
+      - ./bazarr:/config
+      - /media/hdd:/media/hdd #ExtraHDD
+    ports:
+      - 6767:6767
+    restart: always
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Brussels
+    volumes:
+      - ./prowlarr:/config
+    ports:
+      - 9696:9696
+    restart: always
+
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: overseerr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Brussels
+    volumes:
+      - ./data:/config
+    ports:
+      - 5055:5055
+    restart: always
+
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:latest
+    container_name: tautulli
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Brussels
+    volumes:
+      - ./data:/config
+    ports:
+      - 8181:8181
+    restart: always
+
+  plex:
+    image: plexinc/pms-docker:public
+    container_name: plex
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Brussels
+      - PLEX_CLAIM= claim-UYAJCWR9LeZecnciByg1
+    networks:
+      - default
+    ports:
+      - 32400:32400
+    devices:
+      - /dev/dri:/dev/dri # for hardware transcoding
+    volumes:
+      - ./data:/config
+      - /media/hdd/series:/tv
+      - /media/hdd/films:/movies
+      - /dev/shm:/transcode
+    restart: unless-stopped
