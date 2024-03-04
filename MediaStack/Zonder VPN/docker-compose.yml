@@ -7,7 +7,7 @@ networks:
 services:
 
   transmission:
-    image: linuxserver/transmission:4.0.5
+    image: linuxserver/transmission:latest
     environment:
       - PUID=1000
       - PGID=1000
@@ -101,22 +101,27 @@ services:
     restart: always
 
   plex:
-    image: plexinc/pms-docker:public
+    image: lscr.io/linuxserver/plex:latest
     container_name: plex
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Brussels
-      - PLEX_CLAIM= claim-UYAJCWR9LeZecnciByg1
-    networks:
-      - default
-    ports:
-      - 32400:32400
-    devices:
-      - /dev/dri:/dev/dri # for hardware transcoding
+      - VERSION=docker
+      - PLEX_CLAIM=claim-qC2fEMbhNeVEqp86CfU-  #AANPASSEN BIJ NIEUWE INSTALL
     volumes:
       - ./data:/config
       - /media/hdd/series:/tv
       - /media/hdd/films:/movies
       - /dev/shm:/transcode
+    devices:
+      - /dev/dri:/dev/dri
+    ports:
+      - 32400:32400
+      - 1900:1900/udp
+      - 32410:32410/udp
+      - 32412:32412/udp
+      - 32413:32413/udp
+      - 32414:32414/udp
+      - 32469:32469
     restart: unless-stopped
