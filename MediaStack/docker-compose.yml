@@ -1,47 +1,47 @@
 version: "2.0"
 services:
   wireguard:
-    image: linuxserver/wireguard:version-v1.0.20210914
+    image: qmcgaw/gluetun:latest
+    container_name: wireguard
     cap_add:
       - NET_ADMIN
-      - SYS_MODULE
-    sysctls:
-      - net.ipv6.conf.all.disable_ipv6=0
-      - net.ipv4.conf.all.src_valid_mark=1
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Brussels
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY= # ZELF IN TE VULLEN
+      - WIREGUARD_ADDRESSES= # ZELF IN TE VULLEN
+      - SERVER_CITIES=Brussels
     ports:
-      - "9091:9091/tcp"
-      - 8000:9091 #Transmission
       - 8001:8989 #Sonarr
       - 8002:7878 #Radarr
       - 8003:6767 #Bazarr
       - 8004:9696 #Prowlarr
-    volumes:
-      - ./wg0.conf:/config/wg_confs/wg0.conf
-      - /lib/modules:/lib/modules
+      - 8005:9091 #Transmission
     restart: always
+
   transmission:
-    image: linuxserver/transmission:4.0.5
+    image: linuxserver/transmission:latest
     network_mode: "service:wireguard"
+    container_name: transmission
     depends_on:
       - wireguard
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Brussels
-    env_file:
-      - ./transmission.env
+      - USER=admin
+      - PASS=admin
     volumes:
-      - ./transmission-config:/config
+      - ./transmission:/config
       - /media/hdd:/media/hdd
     restart: always
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
+    network_mode: "service:wireguard"
     container_name: sonarr
+    depends_on:
+      - wireguard
     environment:
       - PUID=1000
       - PGID=1000
@@ -49,12 +49,14 @@ services:
     volumes:
       - ./sonarr:/config
       - /media/hdd:/media/hdd #ExtraHDD
-    network_mode: "service:wireguard"
     restart: always
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
+    network_mode: "service:wireguard"
     container_name: radarr
+    depends_on:
+      - wireguard
     environment:
       - PUID=1000
       - PGID=1000
@@ -62,12 +64,14 @@ services:
     volumes:
       - ./radarr:/config
       - /media/hdd:/media/hdd #ExtraHDD
-    network_mode: "service:wireguard"
     restart: always
 
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
+    network_mode: "service:wireguard"
     container_name: bazarr
+    depends_on:
+      - wireguard
     environment:
       - PUID=1000
       - PGID=1000
@@ -75,19 +79,20 @@ services:
     volumes:
       - ./bazarr:/config
       - /media/hdd:/media/hdd #ExtraHDD
-    network_mode: "service:wireguard"
     restart: always
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
+    network_mode: "service:wireguard"
     container_name: prowlarr
+    depends_on:
+      - wireguard
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Brussels
     volumes:
       - ./prowlarr:/config
-    network_mode: "service:wireguard"
     restart: always
 
   overseerr:
@@ -98,9 +103,9 @@ services:
       - PGID=1000
       - TZ=Europe/Brussels
     volumes:
-      - ./data:/config
+      - ./overseerr:/config
     ports:
-      - 8005:5055
+      - 8006:5055
     restart: always
 
   tautulli:
@@ -111,34 +116,33 @@ services:
       - PGID=1000
       - TZ=Europe/Brussels
     volumes:
-      - ./data:/config
+      - ./tautulli:/config
     ports:
-      - 8006:8181
+      - 8007:8181
     restart: always
 
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
-    network_mode: host
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Brussels
       - VERSION=docker
-      - PLEX_CLAIM= #optional
+      - PLEX_CLAIM= #ZELF IN TE VULLEN
     volumes:
-      - ./data:/config
-      - /media/hdd/series:/tv
-      - /media/hdd/films:/movies
+      - ./plex:/config
+      - /media/hdd:/media/hdd
+      - /dev/shm:/transcode #HARDWARE TRANSCODING
     ports:
       - 32400:32400
     devices:
-      - /dev/dri:/dev/dri
-    restart: unless-stopped
+      - /dev/dri:/dev/dri #HARDWARE TRANSCODING
+    restart: always
 
 networks:
   default:
     ipam:
       config:
-        - subnet: 192.168.1.0/24
-          gateway: 192.168.1.1
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1

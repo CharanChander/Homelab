@@ -1,17 +1,13 @@
 version: "3.9"
-
-networks:
-  default:
-    driver: bridge
-
 services:
-
   transmission:
     image: linuxserver/transmission:latest
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Brussels
+      - USER=admin
+      - PASS=admin
     volumes:
       - ./transmission-config:/config
       - /media/hdd:/media/hdd
@@ -108,20 +104,13 @@ services:
       - PGID=1000
       - TZ=Europe/Brussels
       - VERSION=docker
-      - PLEX_CLAIM=claim-qC2fEMbhNeVEqp86CfU-  #AANPASSEN BIJ NIEUWE INSTALL
+      - PLEX_CLAIM=  #ZELF IN TE VULLEN
     volumes:
-      - ./data:/config
-      - /media/hdd/series:/tv
-      - /media/hdd/films:/movies
-      - /dev/shm:/transcode
+      - ./plex:/config
+      - /media/hdd:/media/hdd
+      - /dev/shm:/transcode #HARDWARE TRANSCODING
     devices:
-      - /dev/dri:/dev/dri
+      - /dev/dri:/dev/dri #HARDWARE TRANSCODING
     ports:
       - 32400:32400
-      - 1900:1900/udp
-      - 32410:32410/udp
-      - 32412:32412/udp
-      - 32413:32413/udp
-      - 32414:32414/udp
-      - 32469:32469
-    restart: unless-stopped
+    restart: always
