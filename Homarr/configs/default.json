@@ -519,12 +519,12 @@
           {
             "field": "username",
             "type": "public",
-            "value": "bigchacha"
+            "value": "ZELF IN TE VULLEN"
           },
           {
             "field": "password",
             "type": "private",
-            "value": "1243Tractor"
+            "value": "ZELF IN TE VULLEN"
           }
         ]
       }
@@ -875,12 +875,12 @@
           {
             "field": "username",
             "type": "public",
-            "value": "admin"
+            "value": "ZELF IN TE VULLEN"
           },
           {
             "field": "password",
             "type": "private",
-            "value": "admin"
+            "value": "ZELF IN TE VULLEN"
           }
         ]
       }
